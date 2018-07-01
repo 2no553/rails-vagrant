@@ -14,7 +14,7 @@
 - rails 5.2.0
 
 #### other info
-- github:[VagrantとVirtualBoxでCentOSにnginxとpumaのRails環境を構築する \- Qiita](https://qiita.com/2no553/items/bc786fd1920312353e7e)
+- Qiita:[VagrantとVirtualBoxでCentOSにnginxとpumaのRails環境を構築する \- Qiita](https://qiita.com/2no553/items/bc786fd1920312353e7e)
 - blog:[VagrantとVirtualBoxでCentOSにnginxとpumaのRails環境を構築する – Ninolog](https://ninolog.com/set-rails-virtualbox-vagrant-with-puma-nginx/)
 
 ### setting vagrant

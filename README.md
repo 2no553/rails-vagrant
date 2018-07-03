@@ -50,10 +50,7 @@ $ rake db:migrate:status
 
 ### connect puma-nginx by unix-socket
 ```
-$ mkdir puma_shared
-$ cd puma_shared
-$ mkdir sockets
-$ cd ../
+$ mkdir -p puma_shared/sockets
 
 $ vi config/puma.rb
 + shared_dir = "/puma_shared"

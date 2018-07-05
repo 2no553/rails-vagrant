@@ -18,12 +18,131 @@
 - blog:[VagrantとVirtualBoxでCentOSにnginxとpumaのRails環境を構築する – Ninolog](https://ninolog.com/set-rails-virtualbox-vagrant-with-puma-nginx/)
 
 ### setting vagrant
+
+```
+$ brew cask install vagrant virtualbox
+$ brew cask list
+```
 ```
 $ git clone https://github.com/2no553/rails-vagrant.git
 $ cd rails-vagrant
 $ vagrant up
+```
+
+### setting centos
+
+```
 $ vagrant ssh
-$ cd /vagrant/app-name
+$ sudo yum update -y
+
+$ sudo sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+$ sudo reboot
+$ vagrant reload
+$ vagrant ssh
+$ getenforce
+
+$ sudo timedatectl set-timezone Asia/Tokyo
+$ timedatectl status
+
+$ sudo yum reinstall -y glibc-common
+$ localectl list-locales
+
+$ sudo localectl set-locale LANG=ja_JP.utf8
+$ sudo localectl set-keymap jp106
+$ localectl status
+```
+```
+#日本語フォント インストール（必要に応じて）
+$ sudo yum install ibus-kkc vlgothic-*
+```
+
+### install rails
+
+```
+$ sudo yum install git gcc-c++ openssl-devel readline-devel zlib-devel -y
+
+$ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+$ cd ~/.rbenv && src/configure && make -C src
+$ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+$ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+$ source ~/.bash_profile
+$ rbenv --version
+
+$ mkdir -p "$(rbenv root)"/plugins
+$ git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+$ cd "$(rbenv root)"/plugins/ruby-build && git pull
+
+$ rbenv install -l
+$ rbenv install 2.5.1
+$ rbenv global 2.5.1
+$ rbenv rehash
+$ ruby -v
+$ rbenv versions
+$ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash
+
+$ gem install bundler
+
+$ gem install rails
+$ rails -v
+```
+
+### install nginx
+
+```
+$ sudo vi /etc/yum.repos.d/nginx.repo
++ [nginx]
++ name=nginx repo
++ baseurl=http://nginx.org/packages/mainline/centos/7/$basearch/
++ gpgcheck=0
++ enabled=1
+
+$ sudo yum info nginx
+$ sudo yum install nginx -y
+$ nginx -v
+
+$ sudo systemctl start nginx
+$ sudo systemctl enable nginx
+$ sudo systemctl status nginx
+
+http://192.168.33.10/
+```
+
+### install postgresql
+
+```
+$ sudo vi /etc/yum.repos.d/CentOS-Base.repo
+  [base]
+  name=CentOS-$releasever - Base
+  mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os&infra=$infra
+  #baseurl=http://mirror.centos.org/centos/$releasever/os/$basearch/
+  gpgcheck=1
+  gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
++ exclude=postgresql*
+
+$ sudo yum localinstall https://download.postgresql.org/pub/repos/yum/testing/11/redhat/rhel-7-x86_64/pgdg-centos11-11-1.noarch.rpm -y
+$ sudo yum info postgresql-server
+$ sudo yum install postgresql-server -y
+$ sudo yum install postgresql-devel -y
+$ psql --version
+
+$ sudo /usr/pgsql-11/bin/postgresql-11-setup initdb
+
+$ sudo systemctl start postgresql-11
+$ sudo systemctl enable postgresql-11
+$ sudo systemctl status postgresql-11
+
+$ sudo -u postgres psql -U postgres
+postgres=# \q
+$ sudo passwd postgres
+
+$ su - postgres
+-bash-4.2$ createuser vagrant -s
+-bash-4.2$ exit
+
+$ ls -l /usr/pgsql-11/bin/pg*
+$ gem install pg -- --with-pg-config=/usr/pgsql-11/bin/pg_config
+$ cd /vagrant
+$ rails new app-name --force --database=postgresql
 ```
 
 ### start rails
@@ -38,17 +157,18 @@ $ bundle install
 $ rake db:create
 $ rails s
 
-#view rails start
 http://192.168.33.10:3000/
 ```
 
 ### test migration
+
 ```
 $ rails generate model Article title:string text:text
 $ rake db:migrate:status
 ```
 
 ### connect puma-nginx by unix-socket
+
 ```
 $ mkdir -p puma_shared/sockets
 
@@ -84,11 +204,11 @@ $ sudo systemctl restart nginx
 $ cd /vagrant/app-name
 $ bundle exec puma
 
-#view rails start
 http://192.168.33.10/
 ```
 
 ##### reference
+
 - [puma/config\.rb at e0f544d0ec5769c05e439ba251b5685cb546fed5 · puma/puma](https://github.com/puma/puma/blob/e0f544d0ec5769c05e439ba251b5685cb546fed5/examples/config.rb)
 - [puma/nginx\.md at master · puma/puma](https://github.com/puma/puma/blob/master/docs/nginx.md)
 - [an example of puma and ngxin with ruby on rails config\.md](https://gist.github.com/duleorlovic/762c4ffdf43c8eb31aa7)

@@ -20,10 +20,6 @@
 ### setting vagrant
 
 ```
-$ brew cask install vagrant virtualbox
-$ brew cask list
-```
-```
 $ git clone https://github.com/2no553/rails-vagrant.git
 $ cd rails-vagrant
 $ vagrant up
@@ -170,32 +166,13 @@ $ rake db:migrate:status
 ### connect puma-nginx by unix-socket
 
 ```
-$ mkdir -p puma_shared/sockets
-
-$ vi config/puma.rb
-+ shared_dir = "/puma_shared"
-+ # Set up socket location
-+ bind "unix://#{shared_dir}/sockets/puma.sock"
-
-$ sudo mv puma_shared /
-$ cd /vagrant/app-name
+$ sudo cp ../puma.rb config/puma.rb
+$ sudo cp -r -p ../puma_shared /
 $ bundle exec puma
 Ctrl-C
 ```
 ```
-$ vi app-name.conf
-+ upstream app-name {
-+     server unix:///puma_shared/sockets/puma.sock;
-+ }
-+ server {
-+     listen       80;
-+     server_name  192.168.33.10;
-+     location / {
-+         proxy_pass http://app-name;
-+     }
-+ }
-
-$ sudo mv app-name.conf /etc/nginx/conf.d/
+$ sudo cp ../app-name.conf /etc/nginx/conf.d/
 $ cd /etc/nginx/conf.d/
 $ sudo nginx -t
 $ sudo systemctl restart nginx

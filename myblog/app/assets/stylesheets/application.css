@@ -34,3 +34,8 @@ h2 {
 ul > li {
     margin-bottom: 5px;
 }
+
+.logo {
+    width: 400px;
+    height: 50px;
+}

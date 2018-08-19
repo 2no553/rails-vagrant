@@ -39,3 +39,29 @@ ul > li {
     width: 400px;
     height: 50px;
 }
+
+.header-menu {
+    font-size: 12px;
+    font-weight: normal;
+    float: right;
+}
+
+input[type="text"],textarea {
+    box-sizing: border-box;
+    width: 400px;
+    padding: 5px;
+}
+
+textarea {
+    height: 160px;
+}
+
+.error {
+    font-size: 12px;
+    font-weight: bold;
+    color: tomato;
+}
+
+.command {
+    font-size: 12px;
+}
